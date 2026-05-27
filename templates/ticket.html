@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket {{ ticket.ticket_id }} | Datastraw CRM</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center shadow">
+        <h1 class="text-xl font-bold">Datastraw Support CRM</h1>
+        <a href="/" class="bg-white text-blue-700 px-4 py-2 rounded font-semibold hover:bg-blue-50">← Back to Tickets</a>
+    </nav>
+
+    <div class="max-w-3xl mx-auto p-6 space-y-6">
+        <!-- Ticket Details -->
+        <div class="bg-white rounded shadow p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">{{ ticket.subject }}</h2>
+                    <p class="text-blue-600 font-mono text-sm mt-1">{{ ticket.ticket_id }}</p>
+                </div>
+                {% if ticket.status == 'Open' %}
+                    <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">Open</span>
+                {% elif ticket.status == 'In Progress' %}
+                    <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">In Progress</span>
+                {% else %}
+                    <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm font-semibold">Closed</span>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-4">
+                <div><span class="font-medium">Customer:</span> {{ ticket.customer_name }}</div>
+                <div><span class="font-medium">Email:</span> {{ ticket.customer_email }}</div>
+                <div><span class="font-medium">Created:</span> {{ ticket.created_at }}</div>
+                <div><span class="font-medium">Updated:</span> {{ ticket.updated_at }}</div>
+            </div>
+
+            <div class="bg-gray-50 rounded p-4">
+                <p class="text-sm font-medium text-gray-700 mb-2">Description</p>
+                <p class="text-gray-600 text-sm">{{ ticket.description }}</p>
+            </div>
+        </div>
+
+        <!-- Update Ticket -->
+        <div class="bg-white rounded shadow p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Update Ticket</h3>
+            <form action="/update/{{ ticket.ticket_id }}" method="post" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Update Status</label>
+                    <select name="status" class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="Open" {% if ticket.status == 'Open' %}selected{% endif %}>Open</option>
+                        <option value="In Progress" {% if ticket.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                        <option value="Closed" {% if ticket.status == 'Closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Add Note</label>
+                    <textarea name="note" rows="3" placeholder="Add a note or comment..."
+                        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded font-semibold hover:bg-blue-700">
+                    Update Ticket
+                </button>
+            </form>
+        </div>
+
+        <!-- Notes History -->
+        <div class="bg-white rounded shadow p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Notes History</h3>
+            {% if notes %}
+                <div class="space-y-3">
+                    {% for note in notes %}
+                    <div class="bg-blue-50 border-l-4 border-blue-400 rounded p-3">
+                        <p class="text-gray-700 text-sm">{{ note.note_text }}</p>
+                        <p class="text-gray-400 text-xs mt-1">{{ note.created_at }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-400 text-sm">No notes yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

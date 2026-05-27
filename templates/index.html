@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support CRM | Datastraw</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-blue-700 text-white px-6 py-4 flex justify-between items-center shadow">
+        <h1 class="text-xl font-bold">Datastraw Support CRM</h1>
+        <a href="/create" class="bg-white text-blue-700 px-4 py-2 rounded font-semibold hover:bg-blue-50">+ New Ticket</a>
+    </nav>
+
+    <div class="max-w-6xl mx-auto p-6">
+        <!-- Search & Filter -->
+        <form method="get" action="/" class="flex gap-3 mb-6 flex-wrap">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search by name, email, ID..."
+                class="flex-1 border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <select name="status" class="border border-gray-300 rounded px-4 py-2 focus:outline-none">
+                <option value="">All Status</option>
+                <option value="Open" {% if current_status == 'Open' %}selected{% endif %}>Open</option>
+                <option value="In Progress" {% if current_status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                <option value="Closed" {% if current_status == 'Closed' %}selected{% endif %}>Closed</option>
+            </select>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Search</button>
+            <a href="/" class="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400">Clear</a>
+        </form>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-white rounded shadow p-4 text-center">
+                <p class="text-2xl font-bold text-blue-600">{{ tickets|length }}</p>
+                <p class="text-gray-500 text-sm">Total Tickets</p>
+            </div>
+            <div class="bg-white rounded shadow p-4 text-center">
+                <p class="text-2xl font-bold text-green-600">{{ tickets|selectattr('status','equalto','Open')|list|length }}</p>
+                <p class="text-gray-500 text-sm">Open</p>
+            </div>
+            <div class="bg-white rounded shadow p-4 text-center">
+                <p class="text-2xl font-bold text-gray-600">{{ tickets|selectattr('status','equalto','Closed')|list|length }}</p>
+                <p class="text-gray-500 text-sm">Closed</p>
+            </div>
+        </div>
+
+        <!-- Ticket Table -->
+        <div class="bg-white rounded shadow overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-blue-600 text-white">
+                    <tr>
+                        <th class="px-4 py-3 text-left">Ticket ID</th>
+                        <th class="px-4 py-3 text-left">Customer</th>
+                        <th class="px-4 py-3 text-left">Subject</th>
+                        <th class="px-4 py-3 text-left">Status</th>
+                        <th class="px-4 py-3 text-left">Created</th>
+                        <th class="px-4 py-3 text-left">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-3 font-mono text-blue-700">{{ ticket['ticket_id'] }}</td>
+                        <td class="px-4 py-3">
+                            <p class="font-medium">{{ ticket['customer_name'] }}</p>
+                            <p class="text-gray-400 text-xs">{{ ticket['customer_email'] }}</p>
+                        </td>
+                        <td class="px-4 py-3">{{ ticket['subject'] }}</td>
+                        <td class="px-4 py-3">
+                            {% if ticket['status'] == 'Open' %}
+                                <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">Open</span>
+                            {% elif ticket['status'] == 'In Progress' %}
+                                <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-semibold">In Progress</span>
+                            {% else %}
+                                <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs font-semibold">Closed</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-gray-500 text-xs">{{ ticket['created_at'] }}</td>
+                        <td class="px-4 py-3">
+                            <a href="/ticket/{{ ticket['ticket_id'] }}" class="text-blue-600 hover:underline font-medium">View</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-400">No tickets found. <a href="/create" class="text-blue-600 hover:underline">Create one?</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
